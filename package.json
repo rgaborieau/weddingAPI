@@ -1,0 +1,24 @@
+{
+  "name": "wedding_api",
+  "version": "1.0.0",
+  "description": "API in order to save data for my wedding Android app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rgaborieau/weddingAPI.git"
+  },
+  "author": "Romain GABORIEAU",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rgaborieau/weddingAPI/issues"
+  },
+  "homepage": "https://github.com/rgaborieau/weddingAPI#readme",
+  "dependencies": {
+    "http": "0.0.0",
+    "url": "^0.11.0"
+  }
+}
