@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 var index = require('./routes/guest');
 var animation = require('./routes/animation');
 
+var sqlite3 = require('sqlite3').verbose()
+
 var app = express();
 
 // view engine setup
@@ -42,5 +44,15 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+// Setup database
+var db = new sqlite3.Database('./database.db')
+
+db.serialize(function () {
+    db.run('CREATE TABLE IF NOT EXISTS guest (firstname TEXT, lastname TEXT, present INTEGER)')
+    db.run('CREATE TABLE IF NOT EXISTS animation (name TEXT, description TEXT)')
+})
+
+db.close()
 
 module.exports = app;
