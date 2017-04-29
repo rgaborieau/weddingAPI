@@ -49,8 +49,8 @@ app.use(function(err, req, res, next) {
 var db = new sqlite3.Database('./database.db')
 
 db.serialize(function () {
-    db.run('CREATE TABLE IF NOT EXISTS guest (firstname TEXT, lastname TEXT, present INTEGER)')
-    db.run('CREATE TABLE IF NOT EXISTS animation (name TEXT, description TEXT)')
+    db.run('CREATE TABLE IF NOT EXISTS guest (firstname TEXT, lastname TEXT, present INTEGER, unique(firstname,lastname))')
+    db.run('CREATE TABLE IF NOT EXISTS animation (name TEXT primary key, description TEXT)')
 })
 
 db.close()
