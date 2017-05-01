@@ -5,7 +5,6 @@ var sqlite3 = require('sqlite3').verbose()
 router.get('/', function (req, res) {
 
     var db = new sqlite3.Database('./database.db')
-    var response = { lastname: '', firstname: '', present: false }
 
     db.serialize(function () {
         var query = 'SELECT * FROM guest';
@@ -19,9 +18,11 @@ router.get('/', function (req, res) {
                 var rowsJson = []
 
                 for (var i = 0; i < rows.length; i = i + 1) {
-                    response.lastname = rows[0].lastname;
-                    response.firstname = rows[0].firstname;
-                    response.present = (rows[0].present != 0);
+                    var response = { lastname: '', firstname: '', presentWR: false, presentEvening: false }
+                    response.lastname = rows[i].lastname;
+                    response.firstname = rows[i].firstname;
+                    response.presentWR = (rows[i].presentWR != 0);
+                    response.presentEvening = (rows[i].presentEvening != 0);
 
                     rowsJson[rowsJson.length] = response;
                 }
@@ -39,16 +40,24 @@ router.post('/:lastname/:firstname', function (req, res, next) {
     if (typeof req.params.firstname !== 'undefined' && typeof req.params.lastname !== 'undefined') {
         var firstname = req.params.firstname;
         var lastname = req.params.lastname;
-        var present = 0;
+        var presentWR = 0;
+        var presentEvening = 0;
 
-        if(typeof req.body.present !== 'undefined' && req.body.present == 'true'){
-            present = 1;
+        console.log(typeof req.body.presentWR);
+        console.log(typeof req.body.presentEvening);
+
+        if (typeof req.body.presentWR !== 'undefined' && req.body.presentWR == 'true') {
+            presentWR = 1;
+        }
+
+        if (typeof req.body.presentEvening !== 'undefined' && req.body.presentEvening == 'true') {
+            presentEvening = 1;
         }
 
         var db = new sqlite3.Database('./database.db')
 
         db.serialize(function () {
-            db.run('INSERT OR REPLACE INTO guest(firstname,lastname,present) VALUES (\'' + firstname + '\',\'' + lastname + '\',' + present + ')', function (err) {
+            db.run('INSERT OR REPLACE INTO guest(firstname,lastname,presentWR,presentEvening) VALUES (\'' + firstname + '\',\'' + lastname + '\',' + presentWR + ',' + presentEvening + ')', function (err) {
 
                 if (err) {
                     console.log(err)
@@ -70,7 +79,7 @@ router.get('/:lastname/:firstname', function (req, res) {
         var firstname = req.params.firstname;
         var lastname = req.params.lastname;
 
-        var response = {lastname:'', firstname:'', present : false}
+        var response = {lastname:'', firstname:'', presentWR : false, presentEvening : false}
 
         var db = new sqlite3.Database('./database.db')
 
@@ -86,7 +95,8 @@ router.get('/:lastname/:firstname', function (req, res) {
                     if (rows.length > 0) {
                         response.lastname = rows[0].lastname;
                         response.firstname = rows[0].firstname;
-                        response.present = (rows[0].present != 0);
+                        response.presentWR = (rows[0].presentWR != 0);
+                        response.presentEvening = (rows[0].presentEvening != 0);
 
                         res.status(200)
                         res.send(response)
@@ -136,15 +146,16 @@ router.delete('/:lastname/:firstname', function (req, res) {
 });
 
 router.put('/:lastname/:firstname', function (req, res) {
-    if (typeof req.params.firstname !== 'undefined' && typeof req.params.lastname !== 'undefined' && typeof req.body.present !== 'undefined') {
+    if (typeof req.params.firstname !== 'undefined' && typeof req.params.lastname !== 'undefined' && (typeof req.body.presentWR !== 'undefined' || typeof req.body.presentEvening !== 'undefined')) {
         var firstname = req.params.firstname;
         var lastname = req.params.lastname;
-        var present = (req.body.present=="true") ? 1 : 0;
+        var presentWR = (req.body.presentWR == "true") ? 1 : 0;
+        var presentEvening = (req.body.presentEvening == "true") ? 1 : 0;
         
         var db = new sqlite3.Database('./database.db')
 
         db.serialize(function () {
-            var query = 'UPDATE guest SET present=' +  present  + ' WHERE firstname = \'' + firstname + '\' AND lastname = \'' + lastname + '\'';
+            var query = 'UPDATE guest SET presentWR=' +  presentWR  + ',presentEvening=' + presentEvening + ' WHERE firstname = \'' + firstname + '\' AND lastname = \'' + lastname + '\'';
             db.run(query, function (err) {
                 if (err) {
                     console.log(err)
